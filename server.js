@@ -137,55 +137,113 @@ const pathJoin = path.join(__dirname + '/views');
 app.use(express.static(path.join(__dirname + '/views')));
 app.set('view engine', 'ejs');
 
-////////////////MOCK FORM///////////////
+//////////MOCK WELCOME PAGE//////////
 app.get('/index', function (req, res) {
     res.render(pathJoin + '/index');
 });
 
+////////////////MOCK LOGIN///////////////
+app.get('/login', function (req, res) {
+    res.render(pathJoin + '/login');
+});
+
+////////////////MOCK REGISTER///////////////
+app.get('/register', function (req, res) {
+    res.render(pathJoin + '/register');
+});
+
+//////////POST RESPONSE FOR REGISTER PAGE//////////
+app.post('/register', (req, res) => {
+
+    //////////VALIDATION//////////
+    const {name, email, password, password2} = req.body;
+    let errors = [];
+    //////////CHECK PASSWORDS MATCH/////////
+    if(password !== password2) {
+        errors.push({ msg: 'Passwords do not match' });
+    }
+    //////////CHECK PASSWORDS LENGTH//////////
+    if(password.length < 6) {
+        errors.push({ msg: 'Password should be at least 6 characters' });
+    }
+
+    if(errors.length > 0) {
+        res.render('register', {
+            errors,
+            name,
+            email,
+            password,
+            password2,
+            
+        });
+    } else {
+        ////////POST RESPONSE//////////
+        res.send(`Thanks for registering ${req.body.name}. That's all there is for now`);
+
+        ////////SEND TO DATABASE//////////
+        // let query = `INSERT INTO Users(name, email, password) VALUES(?, ?, ?)`;
+
+        // let data = [`${req.body.name}`, `${req.body.email}`, `${req.body.password}`]
+
+        // pool.query(query, data, (err, results, fields) => {
+        //     if(!err)
+        //         res.send(results);
+        //     else
+        //         console.log(err);
+        // });
+        
+    }   
+});
+    
+    
+
+
+    
+
 
 //////////MOCK GET USER LOGIN//////////
-app.get('/users/login', function (req, res) {
-    let query = "SELECT * FROM Users";
+// app.get('/users/login', function (req, res) {
+//     let query = "SELECT * FROM Users";
 
-    pool.query(query, [req.params.id], (err, results, fields) => {
-        if (!err)
-            res.send(results);
-        else
-            console.log(err);
-    });
-});
+//     pool.query(query, [req.params.id], (err, results, fields) => {
+//         if (!err)
+//             res.send(results);
+//         else
+//             console.log(err);
+//     });
+// });
 
 
 //////////MOCK POST//////////
-app.post('users/posts', verifyToken, (req, res) => {
-    jwt.verify(req.token, 'secretkey', (err, authData) => {
-        if (err) {
-            res.sendStatus(403);
-        } else {
-            res.json({
-                message: 'Post created...',
-                authData
-            });
-        }
-    });
-});
+// app.post('users/posts', verifyToken, (req, res) => {
+//     jwt.verify(req.token, 'secretkey', (err, authData) => {
+//         if (err) {
+//             res.sendStatus(403);
+//         } else {
+//             res.json({
+//                 message: 'Post created...',
+//                 authData
+//             });
+//         }
+//     });
+// });
 
 
 
 //////////MOCK LOGIN AUTH//////////
-app.post('/users/login', function (req, res) {
+// app.post('/users/login', function (req, res) {
 
-    const user = {
-        email: 'blake@yahoo.com',
-        password: 'Birmingham'
-    }
+//     const user = {
+//         email: 'blake@yahoo.com',
+//         password: 'Birmingham'
+//     }
 
-    jwt.sign({ user }, 'secretkey', { expiresIn: '60s'}, (err, token) => {
-        res.json({
-            token
-        })
-    });
-});
+//     jwt.sign({ user }, 'secretkey', { expiresIn: '60s'}, (err, token) => {
+//         res.json({
+//             token
+//         })
+//     });
+// });
 
 
 
